@@ -1,7 +1,3 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
 - master
 
@@ -9,7 +5,9 @@ resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  imageName: 'firstrepo'
+  imageTag: '$(Build.BuildId)'
+  fullImageName: '$(imageName):$(imageTag)'
 
 stages:
 - stage: Build
@@ -22,25 +20,28 @@ stages:
        vmImage: New-agent
     steps:
     - task: Docker@2
-      displayName: Build an image
+      displayName: Build Docker Image
       inputs:
         command: build
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile.txt'
+        repository: '$(imageName)'         
         tags: |
-          $(tag)
+          $(imageTag)                     
+
 - stage: Push
-  displayName: push image
+  displayName: Push image
   jobs:
-  - job: push
-    displayName: push
+  - job: Push
+    displayName: Push
     pool:
        name: New-agent
        vmImage: New-agent
     steps:
     - task: Docker@2
-      displayName: push image
+      displayName: Push Docker Image
       inputs:
-        containerRegistry: 'myhubpassword'
-        repository: 'firstrepo'
-        command: 'push'
-        tags: '$(tag)'
+        containerRegistry: 'myhubpassword'  
+        repository: '$(imageName)'          
+        command: push
+        tags: |
+          $(imageTag)                      
