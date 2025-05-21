@@ -5,9 +5,11 @@ resources:
 - repo: self
 
 variables:
+  dockerHubUsername: 'darshan30899'
   imageName: 'firstrepo'
   imageTag: '$(Build.BuildId)'
-  fullImageName: '$(imageName):$(imageTag)'
+  fullImageName: '$(dockerHubUsername)/$(imageName):$(imageTag)'
+
 
 stages:
 - stage: Build
@@ -22,11 +24,11 @@ stages:
     - task: Docker@2
       displayName: Build Docker Image
       inputs:
-        command: build
-        dockerfile: '$(Build.SourcesDirectory)/Dockerfile.txt'
-        repository: '$(imageName)'         
-        tags: |
-          $(imageTag)                     
+         command: build
+         dockerfile: '$(Build.SourcesDirectory)/Dockerfile.txt'
+         repository: '$(dockerHubUsername)/$(imageName)'  
+         tags: |
+              $(imageTag)                    
 
 - stage: Push
   displayName: Push image
@@ -40,8 +42,8 @@ stages:
     - task: Docker@2
       displayName: Push Docker Image
       inputs:
-        containerRegistry: 'myhubpassword'  
-        repository: '$(imageName)'          
-        command: push
-        tags: |
-          $(imageTag)                      
+          containerRegistry: 'myhubpassword'               
+          repository: '$(dockerHubUsername)/$(imageName)'   
+          command: push
+          tags: |
+            $(imageTag)
