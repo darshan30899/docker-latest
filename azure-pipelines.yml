@@ -38,7 +38,7 @@ stages:
        vmImage: New-agent
     steps:
     - task: Docker@2
-      displayName: Build an image
+      displayName: push image
       inputs:
         containerRegistry: 'myhubpassword'
         repository: 'firstrepo'
