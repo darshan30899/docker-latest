@@ -28,3 +28,19 @@ stages:
         dockerfile: '$(Build.SourcesDirectory)/Dockerfile.txt'
         tags: |
           $(tag)
+- stage: Push
+  displayName: push image
+  jobs:
+  - job: push
+    displayName: push
+    pool:
+       name: New-agent
+       vmImage: New-agent
+    steps:
+    - task: Docker@2
+      displayName: Build an image
+      inputs:
+        containerRegistry: 'myhubpassword'
+        repository: 'firstrepo'
+        command: 'push'
+        tags: '$(tag)'
