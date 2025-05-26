@@ -58,7 +58,7 @@ stages:
     steps:
     - task: CopyFiles@2
       inputs:
-        SourceFolder: '$(agent.builddirectory)'
+        SourceFolder: '$(Build.SourcesDirectory)'
         Contents: '**'
         TargetFolder: '$(build.artifactstagingdirectory)'
 - stage: artifact
