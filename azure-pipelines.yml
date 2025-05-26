@@ -47,3 +47,31 @@ stages:
           command: push
           tags: |
             $(imageTag)
+- stage: copyfiles
+  displayName: copyfiles
+  jobs:
+  - job: copyfiles
+    displayName: copyfiles
+    pool:
+       name: New-agent
+       vmImage: New-agent
+    steps:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(agent.builddirectory)'
+        Contents: '**'
+        TargetFolder: '$(build.artifactstagingdirectory)'
+- stage: artifact
+  displayName: artifact
+  jobs:
+  - job: artifact
+    displayName: artifact
+    pool:
+       name: New-agent
+       vmImage: New-agent
+    steps:
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
