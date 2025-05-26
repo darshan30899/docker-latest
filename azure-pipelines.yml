@@ -56,11 +56,15 @@ stages:
        name: New-agent
        vmImage: New-agent
     steps:
+    - script: |
+        echo "Listing contents of $(Build.SourcesDirectory)"
+        ls -R $(Build.SourcesDirectory)
+      displayName: 'Debug: List source folder'
     - task: CopyFiles@2
       inputs:
         SourceFolder: '$(Build.SourcesDirectory)'
         Contents: '**'
-        TargetFolder: '$(build.artifactstagingdirectory)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
 - stage: artifact
   displayName: artifact
   jobs:
