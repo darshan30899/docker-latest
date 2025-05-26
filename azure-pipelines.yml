@@ -51,28 +51,31 @@ stages:
   displayName: copyfiles
   jobs:
   - job: copyfiles
-    displayName: copyfiles
     pool:
-       name: New-agent
-       vmImage: New-agent
+      name: New-agent
     steps:
     - script: |
-        echo "Listing contents of $(Build.SourcesDirectory)"
+        echo "Source directory:"
         ls -R $(Build.SourcesDirectory)
       displayName: 'Debug: List source folder'
+ 
     - task: CopyFiles@2
       inputs:
         SourceFolder: '$(Build.SourcesDirectory)'
         Contents: '**'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
+ 
+    - script: |
+        echo "Artifact staging directory:"
+        ls -R $(Build.ArtifactStagingDirectory)
+      displayName: 'Debug: List artifact staging folder'
+ 
 - stage: artifact
   displayName: artifact
   jobs:
   - job: artifact
-    displayName: artifact
     pool:
-       name: New-agent
-       vmImage: New-agent
+      name: New-agent
     steps:
     - task: PublishBuildArtifacts@1
       inputs:
