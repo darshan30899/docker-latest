@@ -1,16 +1,15 @@
 trigger:
 - master
-
+ 
 resources:
 - repo: self
-
+ 
 variables:
   dockerHubUsername: 'darshan30899'
   imageName: 'firstrepo'
   imageTag: '$(Build.BuildId)'
   fullImageName: '$(dockerHubUsername)/$(imageName):$(imageTag)'
-
-
+ 
 stages:
 - stage: Build
   displayName: Build image
@@ -18,39 +17,41 @@ stages:
   - job: Build
     displayName: Build
     pool:
-       name: New-agent
-       vmImage: New-agent
+      name: New-agent
+      vmImage: New-agent
     steps:
     - task: Docker@2
       displayName: Build Docker Image
       inputs:
-         command: build
-         dockerfile: '$(Build.SourcesDirectory)/Dockerfile.txt'
-         repository: '$(dockerHubUsername)/$(imageName)'  
-         tags: |
-              $(imageTag)                    
-
+        command: build
+        dockerfile: '$(Build.SourcesDirectory)/Dockerfile.txt'
+        repository: '$(dockerHubUsername)/$(imageName)'  
+        tags: |
+          $(imageTag)
+ 
 - stage: Push
   displayName: Push image
   jobs:
   - job: Push
     displayName: Push
     pool:
-       name: New-agent
-       vmImage: New-agent
+      name: New-agent
+      vmImage: New-agent
     steps:
     - task: Docker@2
       displayName: Push Docker Image
       inputs:
-          containerRegistry: 'myhubpassword'               
-          repository: '$(dockerHubUsername)/$(imageName)'   
-          command: push
-          tags: |
-            $(imageTag)
-- stage: copyfiles
-  displayName: copyfiles
+        containerRegistry: 'myhubpassword'               
+        repository: '$(dockerHubUsername)/$(imageName)'   
+        command: push
+        tags: |
+          $(imageTag)
+ 
+- stage: CopyAndPublish
+  displayName: Copy Files and Publish Artifact
   jobs:
-  - job: copyfiles
+  - job: CopyAndPublish
+    displayName: Copy and Publish
     pool:
       name: New-agent
     steps:
@@ -60,6 +61,7 @@ stages:
       displayName: 'Debug: List source folder'
  
     - task: CopyFiles@2
+      displayName: 'Copy files to staging'
       inputs:
         SourceFolder: '$(Build.SourcesDirectory)'
         Contents: '**/*'
@@ -70,13 +72,6 @@ stages:
         ls -R $(Build.ArtifactStagingDirectory)
       displayName: 'Debug: List artifact staging folder'
  
-- stage: artifact
-  displayName: artifact
-  jobs:
-  - job: artifact
-    pool:
-      name: New-agent
-    steps:
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Pipeline Artifact'
       inputs:
