@@ -1,32 +1,27 @@
-name: Deploy to AWS S3
- 
+name: Docker Build And Push To Docker Hub
+
 on:
   push:
     branches:
-      - main
- 
-permissions:
-  id-token: write
-  contents: read
- 
+      - master
+
 jobs:
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
- 
+  build:
+    name: Build Spring Boot
+    runs-on: Linux
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
- 
-      - name: Configure AWS credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        id: buildAndPushImage
+        uses: MaximilianoBz/dockerhub-buildpush@v1.0
         with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          aws-region: ap-south-1
- 
-      - name: Verify AWS identity
-        run: aws sts get-caller-identity
- 
-      - name: Deploy to S3
-        run: |
-          aws s3 sync . s3://mybuckettest1245
+          registry_url: 'docker.io'
+          repository_name: 'demo-app'
+          user_name: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+          image_version: 'v1.0'
+          docker_file: '.'
+      - name: Get pre step result output image_pull_url
+        run: echo "The time was ${{ steps.buildAndPushImage.outputs.image_pull_url }}"
